@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <utility>
+
+#include "bst.hpp"
 
 template<typename T>
 int binary_search(const std::vector<T> &vec, int start, int end, const T &key) {
@@ -49,5 +52,26 @@ int main() {
         std::cout << "Found!" << std::endl;
     else std::cout << "not found." << std::endl;
 
+    BST *bst = new BST();
+    bst->add(11);
+    bst->add(1);
+    bst->add(6);
+    bst->add(-1);
+    bst->add(-10);
+    bst->add(100);
+
+    for(const int i : myints){
+        std::cout << i << std::endl;
+    }
+
+    int *arr = bst->getSortedArray();
+
+    for(int i = 0; i < 6; i++){
+        std::cout << arr[i] << ", ";
+    }
+
+    delete bst;
+    delete arr;
     return 0;
+
 }
