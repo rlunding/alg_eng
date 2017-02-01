@@ -23,7 +23,3 @@ target_link_libraries(testing SOURCE)
 
 add_executable(benchmark "benchmark/benchmark.cpp")
 target_link_libraries(benchmark SOURCE)
-
-#set(SOURCE_FILES src/main.cpp)
-#add_executable(alg_eng ${SOURCE_FILES})
-
