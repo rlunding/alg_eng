@@ -3,7 +3,7 @@
 #include <algorithm>
 
 template<typename T>
-int binary_search(const std::vector<T>& vec, int start, int end, const T& key) {
+int binary_search(const std::vector<T> &vec, int start, int end, const T &key) {
     // Termination condition: start index greater than end index
     if (start > end) return -1;
 
@@ -21,7 +21,7 @@ int binary_search(const std::vector<T>& vec, int start, int end, const T& key) {
 }
 
 template<typename Iterator, typename T>
-Iterator binary_search(Iterator& begin, Iterator& end, const T& key) {
+Iterator binary_search(Iterator &begin, Iterator &end, const T &key) {
     const Iterator NotFound = end;
 
     while (begin < end) {
@@ -40,13 +40,14 @@ Iterator binary_search(Iterator& begin, Iterator& end, const T& key) {
 
 int main() {
     int search = 6;
-    int myints[] = {1,2,3,4,5,4,3,2,1};
-    std::vector<int> v(myints,myints+9);
+    int myints[] = {1, 2, 3, 4, 5, 4, 3, 2, 1};
+    std::vector<int> v(myints, myints + 9);
     std::sort(v.begin(), v.end());
 
     std::cout << "Looking for a " << search << "... ";
-    if (binary_search(v, 0, v.size()-1, search))
-        std::cout << "Found!" << std::endl; else std::cout << "not found." << std::endl;
+    if (binary_search(v, 0, v.size() - 1, search))
+        std::cout << "Found!" << std::endl;
+    else std::cout << "not found." << std::endl;
 
     return 0;
 }
