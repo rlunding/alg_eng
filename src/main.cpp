@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 template<typename T>
 int binary_search(const std::vector<T>& vec, int start, int end, const T& key) {
@@ -41,7 +42,6 @@ int main() {
     int search = 6;
     int myints[] = {1,2,3,4,5,4,3,2,1};
     std::vector<int> v(myints,myints+9);
-
     std::sort(v.begin(), v.end());
 
     std::cout << "Looking for a " << search << "... ";
