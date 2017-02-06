@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "bst.hpp"
-#include "bbst.hpp"
 
 template<typename T>
 int binary_search(const std::vector<T> &vec, int start, int end, const T &key) {
