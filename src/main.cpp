@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "bst.hpp"
+#include "bbst.hpp"
 
 template<typename T>
 int binary_search(const std::vector<T> &vec, int start, int end, const T &key) {
@@ -52,26 +53,11 @@ int main() {
         std::cout << "Found!" << std::endl;
     else std::cout << "not found." << std::endl;
 
-    BST *bst = new BST();
-    bst->add(11);
-    bst->add(1);
-    bst->add(6);
-    bst->add(-1);
-    bst->add(-10);
-    bst->add(100);
+    int array1[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
 
-    for(const int i : myints){
-        std::cout << i << std::endl;
-    }
+    BST* tree = treeFromArray(array1, 19);
+    tree->print();
+    delete tree;
 
-    int *arr = bst->getSortedArray();
-
-    for(int i = 0; i < 6; i++){
-        std::cout << arr[i] << ", ";
-    }
-
-    delete bst;
-    delete arr;
     return 0;
-
 }
