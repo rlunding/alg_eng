@@ -1,5 +1,5 @@
-#ifndef INTERVAL_TREE_TEST
-#define INTERVAL_TREE_TEST
+#ifndef TEMPLATE_TEST
+#define TEMPLATE_TEST
 
 #include "../lib/catch.hpp"
 
