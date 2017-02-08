@@ -83,6 +83,17 @@ private:
         }
     }
 
+    string printHelperTree(Node* node, string prefix, bool is_tail) {
+        string to_print = prefix + (is_tail ? "└── " : "├── ") + std::to_string(node->value) + "\n";
+        if (node->right) {
+            to_print += printHelperTree(node->right, prefix + (is_tail ? "    " : "│   "), false);
+        }
+        if (node->left) {
+            to_print += printHelperTree(node->left, prefix + (is_tail ? "    " : "│   "), true);
+        }
+        return to_print;
+    }
+
 public:
     BST(Node* root, int size);
     BST();
@@ -106,6 +117,10 @@ public:
 
     void print() {
         printHelper(this->root, "");
+    }
+
+    void print_tree() {
+        std::cout << printHelperTree(this->root, "", true) << std::endl;
     }
 };
 
