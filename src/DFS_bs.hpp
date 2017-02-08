@@ -51,7 +51,7 @@ namespace dfs {
         int i = 0;
         //TODO: Can this be done smarter?
         int level = (int) (log2(size));
-        int res = -100000000000;
+        int res = -1000000000;
         while(i < size){
             std::cout << "Index: " << i << std::endl;
             int val = arr[i];
