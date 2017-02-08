@@ -16,6 +16,8 @@ namespace Structure {
 
         Node(int val) {
             this->value = val;
+            this->left = NULL;
+            this->right = NULL;
         }
 
         Node(int val, Node *left, Node *right) {
