@@ -70,13 +70,7 @@ private:
             }
         }
     }
-//    res = ""
-//    if self.right:
-//        res += self.right.descriptor(indent + "   ") + newline("got right")
-//    res += indent + str(self.value)
-//    if self.left:
-//        res += newline("left") + self.left.descriptor(indent + "   ")
-//    return res
+
     void printHelper(Node *root, std::string indent) {
         if (!root) return;
         if(root->right){
@@ -99,6 +93,10 @@ public:
         } else {
             root = new Node(val);
         }
+    }
+
+    Node* getRoot(){
+        return this->root;
     }
 
     int* getSortedArray(){
