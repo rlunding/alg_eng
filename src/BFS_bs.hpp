@@ -4,6 +4,8 @@
 #include <queue>
 #include "bst.hpp"
 
+using namespace Structure;
+
 namespace bfs {
 
     /**

@@ -2,6 +2,7 @@
 #define DFS_BS_ALG
 
 #include "bst.hpp"
+using namespace Structure;
 
 namespace dfs {
 
