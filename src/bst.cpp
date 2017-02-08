@@ -5,13 +5,13 @@ using namespace Structure;
 Node* getSubTreeForInterval(int *arr, int start, int end) {
     int length = end - start;
     if (length == 2) {
-        return new Node(arr[start + 1], new Node(arr[start]), nullptr);
+        return new Node(arr[start + 1], new Node(arr[start]), NULL);
     }
     if (length == 1) {
-        return new Node(arr[start], nullptr, nullptr);
+        return new Node(arr[start], NULL, NULL);
     }
     if (length <= 0) {
-        return nullptr;
+        return NULL;
     }
 
     int levels = (int) (log2(length + 1));
