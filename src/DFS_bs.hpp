@@ -1,7 +1,9 @@
 #ifndef DFS_BS_ALG
 #define DFS_BS_ALG
 
+#include <math.h>
 #include "bst.hpp"
+
 using namespace Structure;
 
 namespace dfs {
@@ -45,7 +47,29 @@ namespace dfs {
      * @return
      */
     int pred(int* arr, int size, int key) {
-        return key;
+
+        int i = 0;
+        //TODO: Can this be done smarter?
+        int level = (int) (log2(size));
+        int res = -100000000000;
+        while(i < size){
+            std::cout << "Index: " << i << std::endl;
+            int val = arr[i];
+            if(val == key){
+                return val;
+            }
+            if(arr[i] > key){
+                //Go left in tree
+                i += 1;
+            } else {
+                res = val;
+                i += pow(2,level);
+                //Go right in tree
+            }
+            level -= 1;
+        }
+
+        return res;
     }
 
 }
