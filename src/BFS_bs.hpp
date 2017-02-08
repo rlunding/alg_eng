@@ -52,7 +52,19 @@ namespace bfs {
      * @return
      */
     int pred(int* arr, int size, int key) {
-        return key;
+        int i = 0;
+        int best = NULL;
+        while (i < size) {
+            if (arr[i] > key) {
+                i = 2 * i + 1;
+            } else if (arr[i] < key) {
+                best = arr[i];
+                i = 2 * i + 2;
+            } else {
+                return arr[i];
+            }
+        }
+        return best;
     }
 
 }
