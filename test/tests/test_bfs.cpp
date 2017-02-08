@@ -84,9 +84,7 @@ TEST_CASE("Test BFS binary search query, n = 9 with element", "[BFS, pred]") {
 TEST_CASE("Test BFS binary search query, n = 10 with element", "[BFS, pred]") {
     int size = 10;
     int numbers[] = {1, 2, 3, 4, 5, 6, 7, 8, 13, 15};
-    std::cout << "hej" << std::endl;
     int *input = bfs::build(numbers, size);
-    std::cout << "hej" << std::endl;
     int result = bfs::pred(input, size, 7);
     REQUIRE(result == 7);
 }

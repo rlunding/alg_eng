@@ -53,7 +53,6 @@ namespace dfs {
         int level = (int) (log2(size));
         int res = -1000000000;
         while(i < size){
-            std::cout << "Index: " << i << std::endl;
             int val = arr[i];
             if(val == key){
                 return val;

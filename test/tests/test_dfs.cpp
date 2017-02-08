@@ -25,14 +25,10 @@ TEST_CASE("Larger DFS build test", "[build, DFS]") {
     }
 }
 
-TEST_CASE("DFS predict simple test", "[pred, DFS") {
+TEST_CASE("DFS predict simple test", "[pred, DFS]") {
     int size = 7;
     int numbers[] = {3,6,9,12,15,18,21};
     int *result = dfs::build(numbers, size);
-    for(int n = 0; n < size; n++){
-        std::cout << result[n] << ", ";
-    }
-    std::cout << std::endl;
 
     int prediction = dfs::pred(result, size, 10);
     REQUIRE(prediction == 9);
