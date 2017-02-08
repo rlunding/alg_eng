@@ -51,8 +51,20 @@ namespace bfs {
      * @param key
      * @return
      */
-    int pred(int* arr, int size, int key) {
-        return key;
+    int pred(int* arr, int size, int key, bool debug=false) {
+        int i = 0;
+        while (i < size) {
+            if (debug) std::cout << i << std::endl;
+            if (arr[i] > key) {
+                i = 2 * i + 1;
+            } else if (arr[i] < key) {
+                i = 2 * i + 2;
+            } else {
+                return arr[i];
+            }
+        }
+        if (debug) std::cout << (i>>2 -1) << std::endl;
+        return arr[i>>2 - 1];
     }
 
 }
