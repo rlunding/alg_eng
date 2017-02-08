@@ -81,14 +81,15 @@ TEST_CASE("Test BFS binary search query, n = 9 with element", "[BFS, pred]") {
     REQUIRE(result == 7);
 }
 
-// TODO: why crash when n = 10?
-/*TEST_CASE("Test BFS binary search query, n = 10 with element", "[BFS, pred]") {
+TEST_CASE("Test BFS binary search query, n = 10 with element", "[BFS, pred]") {
     int size = 10;
-    int numbers[] = {1, 2, 3, 4, 5, 6, 7, 13, 14, 18};
+    int numbers[] = {1, 2, 3, 4, 5, 6, 7, 8, 13, 15};
+    std::cout << "hej" << std::endl;
     int *input = bfs::build(numbers, size);
+    std::cout << "hej" << std::endl;
     int result = bfs::pred(input, size, 7);
     REQUIRE(result == 7);
-}*/
+}
 
 TEST_CASE("Test BFS binary search query, n = 15 with element", "[BFS pred]") {
     int numbers[] = {7, 3, 11, 1, 5, 9, 13, 0, 2, 4, 6, 8, 10, 12, 14};
@@ -100,7 +101,7 @@ TEST_CASE("Test BFS binary search query, n = 3 without element", "[BFS, pred]") 
     int size = 3;
     int numbers[] = {1, 2, 4};
     int *input = bfs::build(numbers, size);
-    int result = bfs::pred(input, size, 3, true);
+    int result = bfs::pred(input, size, 3);
     REQUIRE(result == 2);
 }
 
@@ -108,11 +109,24 @@ TEST_CASE("Test BFS binary search query, n = 5 without element", "[BFS, pred]") 
     int size = 5;
     int numbers[] = {1, 2, 4, 6, 9};
     int *input = bfs::build(numbers, size);
-    int result = bfs::pred(input, size, 5, true);
-    //REQUIRE(result == 4);
+    int result = bfs::pred(input, size, 5);
+    REQUIRE(result == 4);
 }
 
+TEST_CASE("Test BFS binary search query, n = 5 without smaller element", "[BFS, pred]") {
+    int size = 5;
+    int numbers[] = {1, 2, 3, 4, 5};
+    int *input = bfs::build(numbers, size);
+    int result = bfs::pred(input, size, 0);
+    REQUIRE(result == NULL);
+}
 
-
+TEST_CASE("Test BFS binary search query, n = 5 with only smaller elements", "[BFS, pred]") {
+    int size = 5;
+    int numbers[] = {1, 2, 3, 4, 5};
+    int *input = bfs::build(numbers, size);
+    int result = bfs::pred(input, size, 10);
+    REQUIRE(result == 5);
+}
 
 #endif
