@@ -1,7 +1,3 @@
-//
-// Created by fhv on 2/1/17.
-//
-
 #ifndef ALG_ENG_BST_HPP
 #define ALG_ENG_BST_HPP
 
