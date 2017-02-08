@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <algorithm>
 
 using namespace std;
 
@@ -146,6 +147,9 @@ Node* getSubTreeForInterval(int* arr, int start, int end){
 }
 
 BST* treeFromArray(int* arr, int size){
+    //Now we call the sort function
+    sort(arr, arr + size);
+
     Node* root = getSubTreeForInterval(arr, 0, size);
     return new BST(root, size);
 }
