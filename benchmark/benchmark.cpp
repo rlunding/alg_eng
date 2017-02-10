@@ -7,7 +7,7 @@
 #include "../src/DFS_bs.hpp"
 #include "../src/INORDER_bs.hpp"
 
-int RUNS = 10;
+int RUNS = 1000;
 int MIN_TEST_SIZE = 1000000;
 int MAX_TEST_SIZE = 5000000;
 
