@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <chrono>
 #include "../src/data_generator.hpp"
 #include "../src/BFS_bs.hpp"
 #include "../src/DFS_bs.hpp"

@@ -15,13 +15,13 @@ namespace dfs {
         if(root->left){
             build_recursive(arr, root->left, idx, level-1);
         } else if(level > 0){
-            arr[idx] = empty;
+            arr[idx] = root->value;
             idx++;
         }
         if(root->right){
             build_recursive(arr, root->right, idx, level-1);
         } else if(level > 0){
-            arr[idx] = empty;
+            arr[idx] = root->value;
             idx++;
         }
     }
