@@ -22,14 +22,16 @@ void test_running_time() {
     std::cout << "test_running_time!" << std::endl;
     std::vector<Algorithm> algorithms;
     algorithms.push_back({"BFS", bfs::pred, bfs::build});
-    //algorithms.push_back({"DFS", dfs::pred, dfs::build});
+    algorithms.push_back({"DFS", dfs::pred, dfs::build});
     algorithms.push_back({"INORDER", inorder::pred, inorder::build});
 
     // Open file and print header
     std::ofstream resultFile("test_running_time.data");
     for (int i = 0; i < algorithms.size(); ++i) {
         resultFile << algorithms.at(i).algorithm << " ";
+        std::cout << algorithms.at(i).algorithm << " ";
     }
+    std::cout << std::endl;
     resultFile << "N" << std::endl;
 
     // start test

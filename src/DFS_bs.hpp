@@ -9,6 +9,22 @@ using namespace Structure;
 namespace dfs {
     const int empty = -1234567;
 
+    const int tab32[32] = {
+        0,  9,  1, 10, 13, 21,  2, 29,
+        11, 14, 16, 18, 22, 25,  3, 30,
+        8, 12, 20, 28, 15, 17, 24,  7,
+        19, 27, 23,  6, 26,  5,  4, 31};
+
+    int log2_32 (uint32_t value)
+    {
+        value |= value >> 1;
+        value |= value >> 2;
+        value |= value >> 4;
+        value |= value >> 8;
+        value |= value >> 16;
+        return tab32[(uint32_t)(value*0x07C4ACDD) >> 27];
+    }
+
     void build_recursive(int* arr, Node* root, int& idx, int level){
         arr[idx] = root->value;
         idx ++;
@@ -61,8 +77,9 @@ namespace dfs {
         int i = 0;
 
         int level = (int) (log2(size));
+//        int level = log2_32(size);
         int res = empty;
-        int maxSize = pow(2, level+1) -1;
+        int maxSize = (1 << (level + 1)) -1;
         while(i < maxSize && level >= 0){
             int val = arr[i];
             if(val == empty){
