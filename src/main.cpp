@@ -54,13 +54,12 @@ int main() {
         std::cout << "Found!" << std::endl;
     else std::cout << "not found." << std::endl;
 
-    int size = 15;
-    int numbers[] = {2,4,6,8,10,12,14,16,18,20,22,24,26,28,30};
+    int size = 10;
+    int numbers[] = {1, 2, 3, 4, 5, 6, 7, 8, 13, 15};
 
     BST* bst = treeFromArray(numbers, size);
     bst->print();
     bst->print_tree();
-
     delete bst;
 
     return 0;
