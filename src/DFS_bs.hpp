@@ -1,7 +1,7 @@
 #ifndef DFS_BS_ALG
 #define DFS_BS_ALG
 
-#include <math.h>
+//#include <math.h>
 #include "bst.hpp"
 
 using namespace Structure;
@@ -76,8 +76,8 @@ namespace dfs {
 
         int i = 0;
 
-        int level = (int) (log2(size));
-//        int level = log2_32(size);
+//        int level = (int) (log2(size));
+        int level = log2_32(size);
         int res = empty;
         int maxSize = (1 << (level + 1)) -1;
         while(i < maxSize && level >= 0){
@@ -85,16 +85,17 @@ namespace dfs {
             if(val == empty){
                 return res;
             }
-            if(val == key){
-                return val;
-            }
-            if(val > key){
-                //Go left in tree
-                i += 1;
+            if(val != key){
+                if(val > key){
+                    //Go left in tree
+                    i += 1;
+                } else {
+                    //Go right in tree
+                    res = val;
+                    i += 1 << level;
+                }
             } else {
-                //Go right in tree
-                res = val;
-                i += 1 << level;
+                return val;
             }
             level -= 1;
         }
