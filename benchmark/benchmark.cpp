@@ -6,9 +6,11 @@
 #include <sstream>
 #include <iomanip>
 #include "../src/data_generator.hpp"
+#include "../src/bst.cpp"
 #include "../src/BFS_bs.hpp"
 #include "../src/DFS_bs.hpp"
 #include "../src/INORDER_bs.hpp"
+#include "../src/VEB_bs.hpp"
 
 struct Option{
     std::string name;
@@ -99,6 +101,7 @@ void test_running_time() {
     algorithms.push_back({"BFS", bfs::pred, bfs::build});
     algorithms.push_back({"DFS", dfs::pred, dfs::build});
     algorithms.push_back({"INORDER", inorder::pred, inorder::build});
+    algorithms.push_back({"VEB", veb::pred, veb::build});
 
     const int col_width = 9;
     const int col_cnt = (int) algorithms.size() + 1;
@@ -118,7 +121,7 @@ void test_running_time() {
     for (long i = options[min_test_size].long_value; i <= options[max_test_size].long_value; i*=2) {
         int* numbers = generateArray(i); //Generate data
         int query = generateQuery();
-        double times[algorithms.size()] = {0};
+        double times[4 /*algorithms.size()*/] = {0};
 
         for (unsigned long j = 0; j < algorithms.size(); ++j) {
             int* arr = algorithms.at(j).build(numbers, i);
@@ -132,7 +135,7 @@ void test_running_time() {
             }
             time /= (double) options[average].int_value;
             times[j] = time;
-            delete arr;
+            // delete []arr;
         }
         for (int k = 0; k < algorithms.size(); ++k) {
             resultFile << times[k] << " ";
