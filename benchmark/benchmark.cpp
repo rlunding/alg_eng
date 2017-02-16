@@ -115,7 +115,7 @@ void test_running_time() {
     resultFile << "N" << std::endl;
 
     // start test
-    for (long i = options[min_test_size].long_value; i < options[max_test_size].long_value; i*=2) {
+    for (long i = options[min_test_size].long_value; i <= options[max_test_size].long_value; i*=2) {
         int* numbers = generateArray(i); //Generate data
         int query = generateQuery();
         double times[algorithms.size()] = {0};
