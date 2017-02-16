@@ -35,6 +35,9 @@ struct Algorithm {
     int (*pred)(int*, int, int); // Array pointer, array size, key --> return pred(x)
     int* (*build)(int*, int); // Array pointer, array size --> return structured array
 };
+
+void make_plot_for_results(const vector<Algorithm> &algorithms);
+
 std::string str_with_width(std::string str, int width){
     std::string res = str;
     while(res.length() < width){
@@ -71,9 +74,27 @@ void print_header(std::string title, int width){
     std::cout << str_divider(width) << std::endl;
 }
 
+void make_plot_for_results(const int algo_count) {
+    ofstream plotfile(options[output].value + ".gnuplot");
+    plotfile << "set term png\n"
+                    "set output '" + options[output].value + ".png'\n"
+                    "set ylabel 'time [s]' rotate by 90\n"
+                    "set xlabel 'n [# elements]'\n"
+                    "set key autotitle columnhead\n"
+                    "set title 'Comparing Pred(x) running time'\n"
+                    "set key left top\n"
+                    "plot for [col=1:" + to_string(algo_count) + "] '" + options[output].value + ".data' using " +
+                to_string(algo_count + 1) + ":col with lines" << endl;
+    plotfile.close();
+    if(system(("gnuplot " + options[output].value + ".gnuplot").c_str()) != 0){
+        cout << "Something went wrong when plotting results" << endl;
+    }
+    if(system(("rm " + options[output].value + ".gnuplot").c_str()) != 0){
+        cout << "Couldn't remove gnuplot file" << endl;
+    }
+}
+
 void test_running_time() {
-
-
     std::vector<Algorithm> algorithms;
     algorithms.push_back({"BFS", bfs::pred, bfs::build});
     algorithms.push_back({"DFS", dfs::pred, dfs::build});
@@ -123,22 +144,7 @@ void test_running_time() {
     }
 
     resultFile.close();
-    std::ofstream plotfile(options[output].value + ".gnuplot");
-    plotfile << "set term png\n"
-        "set output '" + options[output].value + ".png'\n"
-        "set ylabel 'time [s]' rotate by 90\n"
-        "set xlabel 'n [# elements]'\n"
-        "set key autotitle columnhead\n"
-        "set title 'Comparing Pred(x) running time'\n"
-        "set key left top\n"
-        "plot for [col=1:"+std::to_string(algorithms.size())+"] '" + options[output].value + ".data' using "+std::to_string(algorithms.size()+1)+":col with lines" << std::endl;
-    plotfile.close();
-    if(system(("gnuplot " + options[output].value + ".gnuplot").c_str()) != 0){
-        std::cout << "Something went wrong when plotting results" << std::endl;
-    }
-/*    if(system(("rm " + options[output].value + ".gnuplot").c_str()) != 0){
-        std::cout << "Couldn't remove gnuplot file" << std::endl;
-    }*/
+    make_plot_for_results((const int) algorithms.size());
     std::cout << std::endl << "Done testing running times" << std::endl;
 }
 
