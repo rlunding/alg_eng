@@ -29,14 +29,15 @@ const std::string average = "ITERATIONS";
 const std::string output = "OUTPUT";
 const std::string min_test_size = "MIN_TEST_SIZE";
 const std::string max_test_size = "MAX_TEST_SIZE";
+const std:: string min_sample_value = "MIN_SAMPLE_VALUE";
+const std:: string max_sample_value = "MAX_SAMPLE_VALUE";
+
 
 struct Algorithm {
     std::string algorithm;
     int (*pred)(int*, int, int); // Array pointer, array size, key --> return pred(x)
     int* (*build)(int*, int); // Array pointer, array size --> return structured array
 };
-
-void make_plot_for_results(const vector<Algorithm> &algorithms);
 
 std::string str_with_width(std::string str, int width){
     std::string res = str;
@@ -114,10 +115,14 @@ void test_running_time() {
     std::cout << str_with_width("Size", col_width) << std::endl;
     resultFile << "N" << std::endl;
 
+    int min = options[min_sample_value].int_value;
+    int max = options[max_sample_value].int_value;
     // start test
     for (long i = options[min_test_size].long_value; i <= options[max_test_size].long_value; i*=2) {
-        int* numbers = generateArray(i); //Generate data
-        int query = generateQuery();
+        
+        int* numbers = generateArray(i, min, max); //Generate data
+        // TODO: Find better ways of constructing queries
+        int query = generateQuery(min, max);
         double times[algorithms.size()] = {0};
 
         for (unsigned long j = 0; j < algorithms.size(); ++j) {
@@ -218,6 +223,10 @@ int main(int argc, char* argv[]) {
     options[min_test_size] = {"min_size", "min", "Set minimum build size", false, true, 0, 1000000, "", false};
     // default 5000000 average
     options[max_test_size] = {"max_size", "max", "Set maximum build size", false, true, 0, 5000000, "", false};
+    // default 0
+    options[min_sample_value] = {"min_int", "mini", "Set minimum sample value", false, true, 0, 0, "", false};
+    // default 1000
+    options[max_sample_value] = {"max_int", "maxi", "Set maximum sample value", false, true, 0, 0, "", false};
 
     if(argc < 2){
         print_help();
