@@ -62,7 +62,7 @@ TEST_CASE("DFS predict bigger tree - many queries", "[pred, DFS]") {
     for(int j = 1; j <= size; j++){
         for(int i = 0; i < test_size && i < j; i++){
             int *result = dfs::build(numbers, j);
-            int prediction = dfs::pred(result, j, queries[i]);
+            int prediction = dfs::pred(result, j, queries[i]);  
             REQUIRE(prediction == facit[i]);
             delete result;
         }

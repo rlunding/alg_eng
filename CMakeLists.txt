@@ -8,8 +8,7 @@ add_custom_target(build-time-make-dir ALL COMMAND ${CMAKE_COMMAND} -E make_direc
 
 file(GLOB SOURCE_FILES
         "src/*.cpp"
-        "src/*.hpp"
-        "src/lib/*.hpp")
+        "src/*.hpp")
 
 file(GLOB TEST_FILES
         "test/tests/*.cpp"
@@ -18,10 +17,11 @@ file(GLOB TEST_FILES
 
 add_library(SOURCE ${SOURCE_FILES})
 
-add_executable(main "src/main.cpp")
-target_link_libraries(main SOURCE)
+# add_executable(main "src/main.cpp")
+# target_link_libraries(main SOURCE)
 
 add_executable(testing ${TEST_FILES} "test/test.cpp")
+set_target_properties(testing PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${outdir})
 target_link_libraries(testing SOURCE)
 
 add_executable(benchmark "benchmark/benchmark.cpp")
