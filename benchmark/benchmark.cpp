@@ -10,6 +10,7 @@
 #include "../src/helper.hpp"
 #include "../src/file_handlers.hpp"
 
+#ifdef __GNUC__
 #include<x86intrin.h>
 namespace clocking
 {
@@ -18,6 +19,26 @@ namespace clocking
         return __rdtsc();
     }
 }
+#else
+#ifdef __MSVC__
+#include<intrin.h>
+namespace clocking
+{
+    inline unsigned long long ticks()
+    {
+        return __rdtsc();
+    }
+}
+#else
+namespace clocking
+{
+    inline unsigned long long ticks()
+    {
+        return std::clock();
+    }
+}
+#endif
+#endif
 
 struct argument
 {
@@ -80,8 +101,12 @@ struct algorithm_profile
     { "dfs:s", ".dfs", layouts::dfs::build, layouts::dfs::destroy, layouts::dfs::pred_stable },
     { "veb:r:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_unstable },
     { "veb:r:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_stable },
-    { "veb:b:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_stable },
-    { "veb:b:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_unstable }
+    { "veb:n:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_unstable },
+    { "veb:n:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_stable },
+    { "veb:i:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_unstable },
+    { "veb:i:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_stable },
+    { "veb:b:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_unstable },
+    { "veb:b:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_stable }
 };
 
 algorithm_profile const *chosen;
@@ -299,12 +324,7 @@ bool validate_arguments()
         fputs("Do-not-process cannot be set or unset if algorithm is not set.\n", stderr);
         return false;
     }
-    if (chosen && query_count != 0u && query_count < 1000u)
-    {
-        fputs("The number of queries must be at least 1000 if not zero.\n", stderr);
-        return false;
-    }
-    if (!chosen && query_count < 1000u)
+    if (query_count < 1000u)
     {
         fputs("The number of queries must be at least 1000.\n", stderr);
         return false;
