@@ -37,7 +37,7 @@ namespace layouts
                     return;
                 }
                 unsigned upperHeight = (height >> 1u);
-                unsigned lowerHeight = height - upperHeight;
+                unsigned lowerHeight = upperHeight + (height & 1u);
                 unsigned toptreeNodes = (1u << upperHeight) - 1u;
                 unsigned subtreeNodes = (1u << lowerHeight) - 1u;
                 int const *inorderCursor = inorder;
@@ -69,11 +69,9 @@ namespace layouts
                 }
             }
 
-            int const *vEBsearch(unsigned height, int const *vEB, int y, unsigned &inorderIndex)
+            int const *vEBsearch_recursive_stable(unsigned height, int const *vEB, int y, unsigned &inorderIndex)
             {
                 inorderIndex = 0u;
-                if (height == 0u)
-                    return nullptr;
                 if (height == 1u)
                     return *vEB <= y ? (inorderIndex = 1u, vEB) : nullptr;
                 if (height == 2u)
@@ -83,35 +81,188 @@ namespace layouts
                             ? (inorderIndex = 3u, vEB + 2)
                             : (inorderIndex = 2u, vEB)
                         : vEB[1] <= y
-                            ? (inorderIndex = 1, vEB + 1)
+                            ? (inorderIndex = 1u, vEB + 1)
                             : nullptr;
                 }
                 unsigned upperHeight = (height >> 1u);
-                unsigned lowerHeight = height - upperHeight;
-                unsigned toptreeNodes = (1u << upperHeight) - 1u;
-                unsigned subtreeNodes = (1u << lowerHeight) - 1u;
+                unsigned lowerHeight = upperHeight + (height & 1u);
                 unsigned toptreeInorderIndex;
-                int const *result = vEBsearch(upperHeight, vEB, y, toptreeInorderIndex);
-                int const *subtreeResult = vEBsearch(lowerHeight, vEB + toptreeNodes + toptreeInorderIndex * subtreeNodes, y, inorderIndex);
-                inorderIndex += (toptreeInorderIndex << lowerHeight);
+                int const *result = vEBsearch_recursive_stable(upperHeight, vEB, y, toptreeInorderIndex);
+                unsigned offset = ((1u << upperHeight) - 1u - toptreeInorderIndex) | (toptreeInorderIndex << lowerHeight);
+                int const *subtreeResult = vEBsearch_recursive_stable(lowerHeight, vEB + offset, y, inorderIndex);
+                inorderIndex |= (toptreeInorderIndex << lowerHeight);
                 return subtreeResult ? subtreeResult : result;
             }
 
-            int const *mixsearch(int const *mix, unsigned length, int y, unsigned &inorderIndex)
+            int const *mixsearch_recursive_stable(int const *mix, unsigned length, int y)
             {
                 unsigned i, j;
                 int const *result = nullptr;
-                inorderIndex = 0u;
+                unsigned index = 0u;
                 for (i = 0u, j = length; j && *mix <= y;
-                    ++i,
-                    result = mix++,
-                    inorderIndex += helper::lowbit(j), j = helper::clear_lowbit(j))
+                    ++i, result = mix++,
+                    index += helper::lowbit(j), j = helper::clear_lowbit(j))
                     ;
-                if (!j)
+                int const *subtreeResult = helper::lowbit(j) < 2u
+                    ? nullptr
+                    : vEBsearch_recursive_stable(helper::log2(helper::lowbit(j)), mix + helper::count1(j) + (index - i), y, index);
+                return subtreeResult ? subtreeResult : result;
+            }
+
+            int const *vEBsearch_recursive_unstable(unsigned height, int const *vEB, int y, unsigned &inorderIndex)
+            {
+                inorderIndex = 0u;
+                if (height == 1u)
+                    return *vEB <= y ? (inorderIndex = 1u, vEB) : nullptr;
+                if (height == 2u)
+                {
+                    return vEB[0] <= y
+                        ? vEB[2] <= y
+                            ? (inorderIndex = 3u, vEB + 2)
+                            : (inorderIndex = 2u, vEB)
+                        : vEB[1] <= y
+                            ? (inorderIndex = 1u, vEB + 1)
+                            : nullptr;
+                }
+                unsigned upperHeight = (height >> 1u);
+                unsigned lowerHeight = upperHeight + (height & 1u);
+                unsigned toptreeInorderIndex;
+                int const *result = vEBsearch_recursive_unstable(upperHeight, vEB, y, toptreeInorderIndex);
+                if (result && *result == y)
                     return result;
-                unsigned subtreeIndex;
-                int const *subtreeResult = vEBsearch(helper::log2(helper::lowbit(j)), mix + helper::count1(j) + (inorderIndex - i), y, subtreeIndex);
-                inorderIndex += subtreeIndex;
+                unsigned offset = ((1u << upperHeight) - 1u - toptreeInorderIndex) | (toptreeInorderIndex << lowerHeight);
+                int const *subtreeResult = vEBsearch_recursive_unstable(lowerHeight, vEB + offset, y, inorderIndex);
+                inorderIndex |= (toptreeInorderIndex << lowerHeight);
+                return subtreeResult ? subtreeResult : result;
+            }
+
+            int const *mixsearch_recursive_unstable(int const *mix, unsigned length, int y)
+            {
+                unsigned i, j;
+                int const *result = nullptr;
+                unsigned index = 0u;
+                for (i = 0u, j = length; j && *mix <= y;
+                    ++i, result = mix++,
+                    index += helper::lowbit(j), j = helper::clear_lowbit(j))
+                    ;
+                if (result && *result == y)
+                    return result;
+                int const *subtreeResult = helper::lowbit(j) < 2u
+                    ? nullptr
+                    : vEBsearch_recursive_unstable(helper::log2(helper::lowbit(j)), mix + helper::count1(j) + (index - i), y, index);
+                return subtreeResult ? subtreeResult : result;
+            }
+
+            unsigned bfs2vEB1based(unsigned bfs, unsigned height)
+            {
+                unsigned result = 0u;
+                while (height > 2u)
+                {
+                    unsigned depth = helper::log2(bfs);
+                    unsigned upperHeight = (height >> 1u);
+                    if (depth < upperHeight)
+                    {
+                        height = upperHeight;
+                        continue;
+                    }
+                    depth -= upperHeight;
+                    unsigned lowerHeight = upperHeight + (height & 1u);
+                    unsigned nthSubtree = (bfs >> depth) ^ (1u << upperHeight);
+                    result += (1u << upperHeight) - 1u - nthSubtree + (nthSubtree << lowerHeight);
+                    bfs = (bfs & ((1u << depth) - 1u)) | (1u << depth);
+                    height = lowerHeight;
+                }
+                return result + bfs;
+            }
+
+            constexpr unsigned bfs2vEB1based_recursive(unsigned bfs, unsigned height,
+                unsigned upperHeight = 0u,
+                unsigned lowerHeight = 0u,
+                unsigned depth = 0u,
+                unsigned nthSubtree = 0u)
+            {
+                return height < 3u
+                    ? bfs
+                    : (depth = helper::log2(bfs)) < (upperHeight = (height >> 1u))
+                    ? bfs2vEB1based(bfs, upperHeight)
+                    : (
+                        lowerHeight = upperHeight + (height & 1u),
+                        depth -= upperHeight,
+                        nthSubtree = (bfs >> depth) ^ (1u << upperHeight),
+                        (1u << upperHeight) - 1u - nthSubtree + (nthSubtree << lowerHeight)
+                            + bfs2vEB1based((bfs & ((1u << depth) - 1u)) | (1u << depth), lowerHeight)
+                    );
+            }
+
+            int const *vEBsearch_bfs_stable(unsigned height, int const *vEB, int y)
+            {
+                int const *result = nullptr;
+                for (unsigned i = height, bfs = 1u, veb; i; --i)
+                {
+                    if (vEB[veb = bfs2vEB1based(bfs, height) - 1u] <= y)
+                    {
+                        result = vEB + veb;
+                        bfs <<= 1u;
+                        bfs |= 1u;
+                    }
+                    else
+                    {
+                        bfs <<= 1u;
+                    }
+                }
+                return result;
+            }
+
+            int const *mixsearch_bfs_stable(int const *mix, unsigned length, int y)
+            {
+                unsigned i, j;
+                int const *result = nullptr;
+                unsigned index = 0u;
+                for (i = 0u, j = length; j && *mix <= y;
+                    ++i, result = mix++,
+                    index += helper::lowbit(j), j = helper::clear_lowbit(j))
+                    ;
+                int const *subtreeResult = j
+                    ? vEBsearch_bfs_stable(helper::log2(helper::lowbit(j)), mix + helper::count1(j) + (index - i), y)
+                    : nullptr;
+                return subtreeResult ? subtreeResult : result;
+            }
+
+            int const *vEBsearch_bfs_unstable(unsigned height, int const *vEB, int y)
+            {
+                int const *result = nullptr;
+                for (unsigned i = height, bfs = 1u, veb; i; --i)
+                {
+                    if (vEB[veb = bfs2vEB1based(bfs, height) - 1u] < y)
+                    {
+                        result = vEB + veb;
+                        bfs <<= 1u;
+                        bfs |= 1u;
+                    }
+                    else if (vEB[veb] > y)
+                    {
+                        bfs <<= 1u;
+                    }
+                    else
+                        return vEB + veb;
+                }
+                return result;
+            }
+
+            int const *mixsearch_bfs_unstable(int const *mix, unsigned length, int y)
+            {
+                unsigned i, j;
+                int const *result = nullptr;
+                unsigned index = 0u;
+                for (i = 0u, j = length; j && *mix <= y;
+                    ++i, result = mix++,
+                    index += helper::lowbit(j), j = helper::clear_lowbit(j))
+                    ;
+                if (result && *result == y)
+                    return result;
+                int const *subtreeResult = j
+                    ? vEBsearch_bfs_unstable(helper::log2(helper::lowbit(j)), mix + helper::count1(j) + (index - i), y)
+                    : nullptr;
                 return subtreeResult ? subtreeResult : result;
             }
         }
@@ -135,11 +286,11 @@ namespace layouts
             std::free(veb);
         }
 
-        int const *pred(int const *veb, unsigned veb_size, int y)
-        {
-            unsigned surrogate;
-            return _impl::mixsearch(veb, veb_size, y, surrogate);
-        }
+        typedef int const *(*pred_delegate)(int const *, unsigned, int);
+        pred_delegate const pred_recursive_stable = _impl::mixsearch_recursive_stable;
+        pred_delegate const pred_recursive_unstable = _impl::mixsearch_recursive_unstable;
+        pred_delegate const pred_bfs_stable = _impl::mixsearch_bfs_stable;
+        pred_delegate const pred_bfs_unstable = _impl::mixsearch_bfs_unstable;
     }
 }
 

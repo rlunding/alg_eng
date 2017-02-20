@@ -50,20 +50,20 @@ namespace layouts
 
         int const *pred_stable(int const *dfs, unsigned dfs_size, int y)
         {
-            if (dfs_size == 0u)
-                return nullptr;
             int const *result = nullptr;
-            for (unsigned i = 0u, level = helper::size2height(dfs_size) - 1u;
-                i < dfs_size && level != -1u; --level)
+            while (dfs_size)
             {
-                if (dfs[i] <= y)
+                unsigned left = (1u << (helper::size2height(dfs_size) - 1u));
+                if (*dfs <= y)
                 {
-                    result = dfs + i;
-                    i += (1u << level);
+                    result = dfs;
+                    dfs += left;
+                    dfs_size -= left;
                 }
                 else
                 {
-                    ++i;
+                    ++dfs;
+                    dfs_size = left - 1u;
                 }
             }
             return result;
@@ -72,22 +72,22 @@ namespace layouts
         int const *pred_unstable(int const *dfs, unsigned dfs_size, int y)
         {
             int const *result = nullptr;
-            for (unsigned i = 0u, level = helper::size2height(dfs_size) - 1u;
-                i < dfs_size && level != -1u; --level)
+            while (dfs_size)
             {
-                if (dfs[i] < y)
+                unsigned left = (1u << (helper::size2height(dfs_size) - 1u));
+                if (*dfs < y)
                 {
-                    result = dfs + i;
-                    i += (1u << level);
+                    result = dfs;
+                    dfs += left;
+                    dfs_size -= left;
                 }
-                else if (dfs[i] > y)
+                else if (*dfs > y)
                 {
-                    ++i;
+                    ++dfs;
+                    dfs_size = left - 1u;
                 }
                 else
-                {
-                    return dfs + i;
-                }
+                    return dfs;
             }
             return result;
         }
