@@ -2,11 +2,11 @@
 #include<string>
 #include<cstdio>
 #include<ctime>
-#include "..\src\inorder.hpp"
-#include "..\src\bfs.hpp"
-#include "..\src\dfs.hpp"
-#include "..\src\veb.hpp"
-#include "..\src\file_handlers.hpp"
+#include "../src/inorder.hpp"
+#include "../src/bfs.hpp"
+#include "../src/dfs.hpp"
+#include "../src/veb.hpp"
+#include "../src/file_handlers.hpp"
 
 struct layout_profile
 {
