@@ -28,20 +28,20 @@ We have 10 searching algorithms in total. Below is an exhaustive list of them.
 
 | Abbreviation | Meaning | Description |
 | :----------: | :-----: | :---------- |
-| `ino:s`      | In-order, Stable | Binary search in a sorted array. Always returns the pointer to the **last** element `x` such that `x <= y`. |
-| `ino:u`      | In-order, Unstable | Binary search in a sorted array. Returns the pointer to **one of** the largest elements `x` such that `x <= y`. |
-| `bfs:s`      | BFS order, Stable | Binary search in a **complete** binary search tree, arranged in BFS order in the array. Here complete means every level of the tree is fully filled, except possibly the last level, in which leaves are located to the left. |
-| `bfs:u`      | BFS order, Unstable | Unstable version of the above. |
-| `dfs:s`      | DFS order, Stable | Binary search in a binary search tree, arranged in DFS order in the array. In this binary search tree, any left subtree is **perfect**, and is as large as possible. |
-| `dfs:u`      | DFS order, Unstable | Unstable version of the above. |
-| `veb:r:s`    | van Emde Boas layout, Recursive, Stable | Binary search in a binary search tree, whose left subtrees are arranged in van Emde Boas layout in the array and whose right subtrees' roots are arranged consecutively in the array. Searching happens among the right subtrees' roots and then in a left subtree. Searching in a large left subtree is completed with two recursive calls into the top and bottom subtree, as in van Emde Boas layout. |
-| `veb:r:u`    | van Emde Boas layout, Recursive, Unstable | Unstable version of the above. |
-| `veb:n:s`    | van Emde Boas layout, Inlined + Recursive, Stable | The same algorithm with recursion expanded for all height < 32. |
-| `veb:n:u`    | van Emde Boas layout, Inlined + Recursive, Unstable | Unstable version of the above. |
-| `veb:i:s`    | van Emde Boas layout, Recursive, Stable | Searching in a large left subtree is completed with an explicit stack. |
-| `veb:i:u`    | van Emde Boas layout, Recursive, Unstable | Unstable version of the above. |
-| `veb:b:s`    | van Emde Boas layout, BFS index, Stable | Searching in a large left subtree is completed as if it is searching in BFS layout. The loop tracks the BFS index of the pivot (with fast bit operations) and use an algorithm to convert BFS index to van Emde Boas layout index. The conversion uses a simple loop or tail recursion. |
-| `veb:b:u`    | van Emde Boas layout, BFS index, Unstable | Unstable version of the above. |
+| `ino.s`      | In-order, Stable | Binary search in a sorted array. Always returns the pointer to the **last** element `x` such that `x <= y`. |
+| `ino.u`      | In-order, Unstable | Binary search in a sorted array. Returns the pointer to **one of** the largest elements `x` such that `x <= y`. |
+| `bfs.s`      | BFS order, Stable | Binary search in a **complete** binary search tree, arranged in BFS order in the array. Here complete means every level of the tree is fully filled, except possibly the last level, in which leaves are located to the left. |
+| `bfs.u`      | BFS order, Unstable | Unstable version of the above. |
+| `dfs.s`      | DFS order, Stable | Binary search in a binary search tree, arranged in DFS order in the array. In this binary search tree, any left subtree is **perfect**, and is as large as possible. |
+| `dfs.u`      | DFS order, Unstable | Unstable version of the above. |
+| `veb.rs`    | van Emde Boas layout, Recursive, Stable | Binary search in a binary search tree, whose left subtrees are arranged in van Emde Boas layout in the array and whose right subtrees' roots are arranged consecutively in the array. Searching happens among the right subtrees' roots and then in a left subtree. Searching in a large left subtree is completed with two recursive calls into the top and bottom subtree, as in van Emde Boas layout. |
+| `veb.ru`    | van Emde Boas layout, Recursive, Unstable | Unstable version of the above. |
+| `veb.ns`    | van Emde Boas layout, Inlined + Recursive, Stable | The same algorithm with recursion expanded for all height < 32. |
+| `veb.nu`    | van Emde Boas layout, Inlined + Recursive, Unstable | Unstable version of the above. |
+| `veb.is`    | van Emde Boas layout, Recursive, Stable | Searching in a large left subtree is completed with an explicit stack. |
+| `veb.iu`    | van Emde Boas layout, Recursive, Unstable | Unstable version of the above. |
+| `veb.bs`    | van Emde Boas layout, BFS index, Stable | Searching in a large left subtree is completed as if it is searching in BFS layout. The loop tracks the BFS index of the pivot (with fast bit operations) and use an algorithm to convert BFS index to van Emde Boas layout index. The conversion uses a simple loop or tail recursion. |
+| `veb.bu`    | van Emde Boas layout, BFS index, Unstable | Unstable version of the above. |
 
 ## Test
 It is assumed that the unstable inorder implementation (plain sorted array binary search) is correct. Other implementations are executed and the results are compared against corresponding invocations to unstable inorder implementation.
