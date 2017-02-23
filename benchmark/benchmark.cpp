@@ -9,6 +9,7 @@
 #include "../src/veb.hpp"
 #include "../src/helper.hpp"
 #include "../src/file_handlers.hpp"
+#include "papi.h"
 
 #ifdef __GNUC__
 #include<x86intrin.h>
@@ -384,12 +385,18 @@ void run_isolated_test(std::string const &dataset)
     helper::seed_random_source(rnd_seed);
     for (unsigned i = refresh_count; i; --i)
         pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-    if (dont_process)
-        for (unsigned i = query_count; i; --i)
-            helper::next_int(queries.lb, queries.ub + 1);
-    else
-        for (unsigned i = query_count; i; --i)
-            pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+    int events[] = { PAPI_L1_TCM, PAPI_L2_TCM, PAPI_L3_TCM, PAPI_BR_MSP, PAPI_TOT_INS, PAPI_TOT_CYC };
+    constexpr unsigned counter_count = sizeof(events) / sizeof(events[0]);
+    char const *headers[] = { "L1 Cache Misses", "L2 Cache Misses", "L3 Cache Misses", "Branch Mispredictions", "Total Instructions", "Total Cycles" };
+    long long counters[counter_count] = { };
+    PAPI_start_counters(events, counter_count);
+    for (unsigned i = query_count; i; --i)
+        pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+    PAPI_stop_counters(counters, counter_count);
+    printf("%f", std::log2((double)queries.size));
+    for (unsigned i = 0; i != counter_count; ++i)
+        printf(",%f", counters[i] / (double)query_count);
+    putchar('\n');
 }
 
 void run_test(std::string const &dataset, FILE *f)
