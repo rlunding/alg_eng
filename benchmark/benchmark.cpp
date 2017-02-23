@@ -400,6 +400,7 @@ void run_isolated_test(std::string const &dataset)
     helper::seed_random_source(rnd_seed);
     for (unsigned i = refresh_count; i; --i)
         pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+    constexpr unsigned event_count = sizeof(papi_events) / sizeof(papi_events[0]);
     int events[3];
     long long counters[3];
     for (unsigned i = 0u, j; i != event_count; )
