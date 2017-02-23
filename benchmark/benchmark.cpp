@@ -380,7 +380,7 @@ void run_test(std::string const &dataset, FILE *f)
         double last_measure = 0.0;
         constexpr unsigned event_count = sizeof(papi_events) / sizeof(papi_events[0]);
         algorithm_profile::pred_delegate pred = a.pred;
-        for (unsigned i = 0u, j; i != event_count; )
+        for (unsigned i = 0u, j; i != event_count; i+=j)
         {
             helper::seed_random_source(rnd_seed);
             for (unsigned k = refresh_count; k; --k)
@@ -394,9 +394,9 @@ void run_test(std::string const &dataset, FILE *f)
                 fprintf(stderr, "PAPI_start_counters failed with %d.\n", papi_code);
             for (unsigned k = query_count; k; --k)
                 pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-            int papi_code = PAPI_end_counters(events, j);
+            papi_code = PAPI_stop_counters(counters, j);
             if (papi_code != PAPI_OK)
-                fprintf(stderr, "PAPI_end_counters failed with %d.\n", papi_code);
+                fprintf(stderr, "PAPI_stop_counters failed with %d.\n", papi_code);
             for (unsigned k = 0u; k != j; ++k)
                 fprintf(a.fresult, ",%f", last_measure = counters[k] / (double)query_count);
         }
