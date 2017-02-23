@@ -99,7 +99,7 @@ struct algorithm_profile
     { "veb.ru", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_unstable },
     { "veb.rs", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_stable },
     { "veb.nu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_unstable },
-    { "veb:ns", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_stable },
+    { "veb.ns", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_stable },
     { "veb.iu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_unstable },
     { "veb.is", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_stable },
     { "veb.bu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_unstable },
