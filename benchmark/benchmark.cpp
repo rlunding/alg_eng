@@ -144,16 +144,14 @@ int main(int argc, char *argv[])
     FILE *f = fopen((output + ".data").c_str(), "w");
     for (auto &a : algorithms)
     {
-        bool first = true;
         a.fresult = fopen((output + ".papi." + a.name).c_str(), "w");
+        fputs("LOG2N", a.fresult);
         for (auto const &event : papi_events)
         {
-            if (!first)
-                fputc(',', a.fresult);
-            first = false;
+            fputc(',', a.fresult);
             fputs(event.name, a.fresult);
         }
-        fputc('.', a.fresult);
+        fputc('\n', a.fresult);
         fputs(a.name, f);
         fputc(' ', f);
         printf("%s\t", a.name);
