@@ -144,12 +144,16 @@ int main(int argc, char *argv[])
     FILE *f = fopen((output + ".data").c_str(), "w");
     for (auto &a : algorithms)
     {
+        bool first = true;
         a.fresult = fopen((output + ".papi." + a.name).c_str(), "w");
         for (auto const &event : papi_events)
         {
+            if (!first)
+                fputc(',', a.fresult);
+            first = false;
             fputs(event.name, a.fresult);
-            fputc(',', a.fresult);
         }
+        fputc('.', a.fresult);
         fputs(a.name, f);
         fputc(' ', f);
         printf("%s\t", a.name);
@@ -400,6 +404,7 @@ void run_test(std::string const &dataset, FILE *f)
             for (unsigned k = 0u; k != j; ++k)
                 fprintf(a.fresult, ",%f", last_measure = counters[k] / (double)query_count);
         }
+        fputc('\n', a.fresult);
         fprintf(f, "%f ", last_measure);
         printf("%.0f\t", last_measure);
     }
