@@ -62,9 +62,7 @@ struct argument
     { "output", "o", "Sets the output file name. Defaults to 'result'. This argument is ignored if algorithm is set.", 1u, 2u, argument::string, { }, { "result" }, { } },
     { "seed", "s", "Sets the seed of the random number generator. Defaults to time-based seed.", 1u, 2u, argument::number, { }, { }, { (unsigned)std::time(nullptr) } },
     { "query", "q", "Sets the number of queries to run. Defaults to 1000000, at least 1000, at most 1000000000.", 1u, 2u, argument::number, { }, { }, { 1000000u } },
-    { "refresh", "r", "Sets the number of extra queries to run before measuring the time. Defaults to 0, at most 1000000000.", 1u, 2u, argument::number, { }, { }, { 0u } },
-    { "algorithm", "a", "Sets the only algorithm to run. This is for isolated tests.", 0u, 1u, argument::string, { }, { }, { } },
-    { "dont", "d", "Do not process the queries (but the extra queries will be processed). This switch can only be set or unset if algorithm is set.", 1u, 2u, argument::boolean, { false }, { }, { } }
+    { "refresh", "r", "Sets the number of extra queries to run before measuring the time. Defaults to 1000, at most 1000000000.", 1u, 2u, argument::number, { }, { }, { 1000u } }
 };
 
 constexpr int ARG_INPUT = 0;
@@ -72,15 +70,12 @@ constexpr int ARG_OUTPUT = 1;
 constexpr int ARG_SEED = 2;
 constexpr int ARG_QUERY = 3;
 constexpr int ARG_REFRESH = 4;
-constexpr int ARG_ALGORITHM = 5;
-constexpr int ARG_DONT_PROCESS = 6;
 
 std::vector<std::string> files;
 std::string output;
 unsigned rnd_seed;
 unsigned query_count;
 unsigned refresh_count;
-bool dont_process;
 
 struct algorithm_profile
 {
@@ -92,25 +87,24 @@ struct algorithm_profile
     build_delegate build;
     destroy_delegate destroy;
     pred_delegate pred;
+    FILE *fresult;
 } algorithms[] =
 {
-    { "ino:u", ".ino", layouts::inorder::build, layouts::inorder::destroy, layouts::inorder::pred_unstable },
-    { "ino:s", ".ino", layouts::inorder::build, layouts::inorder::destroy, layouts::inorder::pred_stable },
-    { "bfs:u", ".bfs", layouts::bfs::build, layouts::bfs::destroy, layouts::bfs::pred_unstable },
-    { "bfs:s", ".bfs", layouts::bfs::build, layouts::bfs::destroy, layouts::bfs::pred_stable },
-    { "dfs:u", ".dfs", layouts::dfs::build, layouts::dfs::destroy, layouts::dfs::pred_unstable },
-    { "dfs:s", ".dfs", layouts::dfs::build, layouts::dfs::destroy, layouts::dfs::pred_stable },
-    { "veb:r:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_unstable },
-    { "veb:r:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_stable },
-    { "veb:n:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_unstable },
-    { "veb:n:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_stable },
-    { "veb:i:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_unstable },
-    { "veb:i:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_stable },
-    { "veb:b:u", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_unstable },
-    { "veb:b:s", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_stable }
+    { "ino.u", ".ino", layouts::inorder::build, layouts::inorder::destroy, layouts::inorder::pred_unstable },
+    { "ino.s", ".ino", layouts::inorder::build, layouts::inorder::destroy, layouts::inorder::pred_stable },
+    { "bfs.u", ".bfs", layouts::bfs::build, layouts::bfs::destroy, layouts::bfs::pred_unstable },
+    { "bfs.s", ".bfs", layouts::bfs::build, layouts::bfs::destroy, layouts::bfs::pred_stable },
+    { "dfs.u", ".dfs", layouts::dfs::build, layouts::dfs::destroy, layouts::dfs::pred_unstable },
+    { "dfs.s", ".dfs", layouts::dfs::build, layouts::dfs::destroy, layouts::dfs::pred_stable },
+    { "veb.ru", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_unstable },
+    { "veb.rs", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_recursive_stable },
+    { "veb.nu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_unstable },
+    { "veb:ns", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_inlined_recursive_stable },
+    { "veb.iu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_unstable },
+    { "veb.is", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_iterative_stable },
+    { "veb.bu", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_unstable },
+    { "veb.bs", ".veb", layouts::veb::build, layouts::veb::destroy, layouts::veb::pred_bfs_stable }
 };
-
-algorithm_profile const *chosen;
 
 struct papi_event_profile
 {
@@ -118,17 +112,17 @@ struct papi_event_profile
     char const *name;
 } papi_events[] =
 {
-    { PAPI_L1_TCM, "L1 Cache Misses" },
-    { PAPI_L2_TCM, "L2 Cache Misses" },
-    { PAPI_L3_TCM, "L3 Cache Misses" },
-    { PAPI_TOT_INS, "Total Instructions" },
-    { PAPI_BR_MSP, "Branch Mispredictions" }
+    { PAPI_L1_TCM, "L1_MISS" },
+    { PAPI_L2_TCM, "L2_MISS" },
+    { PAPI_L3_TCM, "L3_MISS" },
+    { PAPI_TOT_INS, "INSTRUCTIONS" },
+    { PAPI_BR_MSP, "BR_MISPRED" },
+    { PAPI_TOT_CYC, "CYCLES" }
 };
 
 void print_usage();
 bool parse_arguments(int argc, char **argv);
 bool validate_arguments();
-void run_isolated_test(std::string const &dataset);
 void run_test(std::string const &dataset, FILE *f);
 void call_gnuplot();
 
@@ -147,27 +141,27 @@ int main(int argc, char *argv[])
     {
         return 2;
     }
-    if (chosen)
+    FILE *f = fopen((output + ".data").c_str(), "w");
+    for (auto &a : algorithms)
     {
-        for (auto const &file : files)
-            run_isolated_test(file);
-    }
-    else
-    {
-        FILE *f = fopen((output + ".data").c_str(), "w");
-        for (auto const &a : algorithms)
+        a.fresult = fopen((output + ".papi." + a.name).c_str(), "w");
+        for (auto const &event : papi_events)
         {
-            fputs(a.name, f);
-            fputc(' ', f);
-            printf("%s\t", a.name);
+            fputs(event.name, a.fresult);
+            fputc(',', a.fresult);
         }
-        fputs("N\n", f);
-        puts("dataset\n");
-        for (auto const &file : files)
-            run_test(file, f);
-        fclose(f);
-        call_gnuplot();
+        fputs(a.name, f);
+        fputc(' ', f);
+        printf("%s\t", a.name);
     }
+    fputs("N\n", f);
+    puts("dataset\n");
+    for (auto const &file : files)
+        run_test(file, f);
+    for (auto const &a : algorithms)
+        fclose(a.fresult);
+    fclose(f);
+    call_gnuplot();
     return 0;
 }
 
@@ -315,29 +309,6 @@ bool validate_arguments()
     rnd_seed = arguments[ARG_SEED].number_values.back();
     query_count = arguments[ARG_QUERY].number_values.back();
     refresh_count = arguments[ARG_REFRESH].number_values.back();
-    if (arguments[ARG_ALGORITHM].string_values.size() != 0u)
-    {
-        std::string const &chosen_name = arguments[ARG_ALGORITHM].string_values.front();
-        for (auto const &a : algorithms)
-        {
-            if (a.name == chosen_name)
-            {
-                chosen = &a;
-                break;
-            }
-        }
-        if (!chosen)
-        {
-            fprintf(stderr, "Unknown algorithm: %s\n", chosen_name.c_str());
-            return false;
-        }
-    }
-    dont_process = arguments[ARG_DONT_PROCESS].bool_values.back();
-    if (!chosen && arguments[ARG_DONT_PROCESS].bool_values.size() > 1u)
-    {
-        fputs("Do-not-process cannot be set or unset if algorithm is not set.\n", stderr);
-        return false;
-    }
     if (query_count < 1000u)
     {
         fputs("The number of queries must be at least 1000.\n", stderr);
@@ -376,48 +347,6 @@ void call_gnuplot()
         fprintf(stderr, "Call to gnuplot failed with code %d.\n", gnuplot_ret);
 }
 
-void run_isolated_test(std::string const &dataset)
-{
-    FILE *fq = fopen(dataset.c_str(), "r");
-    file_handlers::query_file queries{ fq };
-    fclose(fq);
-    if (!queries.valid)
-    {
-        fprintf(stderr, "Query file of %s is invalid.\n", dataset.c_str());
-        return;
-    }
-    FILE *fl = fopen((dataset + chosen->layout_name).c_str(), "r");
-    file_handlers::layout_file layout{ fl };
-    fclose(fl);
-    if (!layout.valid)
-    {
-        fprintf(stderr, "Layout file of %s is invalid.\n", dataset.c_str());
-        return;
-    }
-    double lgsz = std::log2((double)queries.size);
-    printf("%f", lgsz);
-    algorithm_profile::pred_delegate pred = chosen->pred;
-    helper::seed_random_source(rnd_seed);
-    for (unsigned i = refresh_count; i; --i)
-        pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-    constexpr unsigned event_count = sizeof(papi_events) / sizeof(papi_events[0]);
-    int events[3];
-    long long counters[3];
-    for (unsigned i = 0u, j; i != event_count; )
-    {
-        for (j = 0u; j != 3u && i + j != event_count; ++j)
-            events[j] = papi_events[i + j].id;
-        i += j;
-        PAPI_start_counters(events, j);
-        for (unsigned k = query_count; k; --k)
-            pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-        PAPI_stop_counters(counters, event_count);
-        for (unsigned k = 0u; k != j; ++k)
-            printf(",%f", counters[k] / lgsz / query_count);
-    }
-    putchar('\n');
-}
-
 void run_test(std::string const &dataset, FILE *f)
 {
     FILE *fq = fopen(dataset.c_str(), "r");
@@ -447,17 +376,32 @@ void run_test(std::string const &dataset, FILE *f)
             printf("N/A\t");
             continue;
         }
+        fprintf(a.fresult, "%f", std::log2((double)queries.size));
+        double last_measure = 0.0;
+        constexpr unsigned event_count = sizeof(papi_events) / sizeof(papi_events[0]);
         algorithm_profile::pred_delegate pred = a.pred;
-        helper::seed_random_source(rnd_seed);
-        for (unsigned i = refresh_count; i; --i)
-            pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-        auto start_tick = clocking::ticks();
-        for (unsigned i = query_count; i; --i)
-            pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-        auto end_tick = clocking::ticks();
-        double t = (end_tick - start_tick) / (double)query_count;
-        fprintf(f, "%f ", t);
-        printf("%.0f\t", t);
+        for (unsigned i = 0u, j; i != event_count; )
+        {
+            helper::seed_random_source(rnd_seed);
+            for (unsigned k = refresh_count; k; --k)
+                pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+            int events[3];
+            long long counters[3];
+            for (j = 0u; j != 3u && i + j != event_count; ++j)
+                events[j] = papi_events[i + j].id;
+            int papi_code = PAPI_start_counters(events, j);
+            if (papi_code != PAPI_OK)
+                fprintf(stderr, "PAPI_start_counters failed with %d.\n", papi_code);
+            for (unsigned k = query_count; k; --k)
+                pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+            int papi_code = PAPI_end_counters(events, j);
+            if (papi_code != PAPI_OK)
+                fprintf(stderr, "PAPI_end_counters failed with %d.\n", papi_code);
+            for (unsigned k = 0u; k != j; ++k)
+                fprintf(a.fresult, ",%f", last_measure = counters[k] / (double)query_count);
+        }
+        fprintf(f, "%f ", last_measure);
+        printf("%.0f\t", last_measure);
     }
     fprintf(f, "%f\n", std::log2((double)queries.size));
     puts(dataset.c_str());
