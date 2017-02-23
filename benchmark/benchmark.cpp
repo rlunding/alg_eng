@@ -9,6 +9,7 @@
 #include "../src/veb.hpp"
 #include "../src/helper.hpp"
 #include "../src/file_handlers.hpp"
+#include "papi.h"
 
 #ifdef __GNUC__
 #include<x86intrin.h>
@@ -110,6 +111,19 @@ struct algorithm_profile
 };
 
 algorithm_profile const *chosen;
+
+struct papi_event_profile
+{
+    int id;
+    char const *name;
+} papi_events[] =
+{
+    { PAPI_L1_TCM, "L1 Cache Misses" },
+    { PAPI_L2_TCM, "L2 Cache Misses" },
+    { PAPI_L3_TCM, "L3 Cache Misses" },
+    { PAPI_TOT_INS, "Total Instructions" },
+    { PAPI_BR_MSP, "Branch Mispredictions" }
+};
 
 void print_usage();
 bool parse_arguments(int argc, char **argv);
@@ -380,16 +394,27 @@ void run_isolated_test(std::string const &dataset)
         fprintf(stderr, "Layout file of %s is invalid.\n", dataset.c_str());
         return;
     }
+    double lgsz = std::log2((double)queries.size);
+    printf("%f", lgsz);
     algorithm_profile::pred_delegate pred = chosen->pred;
     helper::seed_random_source(rnd_seed);
     for (unsigned i = refresh_count; i; --i)
         pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
-    if (dont_process)
-        for (unsigned i = query_count; i; --i)
-            helper::next_int(queries.lb, queries.ub + 1);
-    else
-        for (unsigned i = query_count; i; --i)
+    int events[3];
+    long long counters[3];
+    for (unsigned i = 0u, j; i != event_count; )
+    {
+        for (j = 0u; j != 3u && i + j != event_count; ++j)
+            events[j] = papi_events[i + j].id;
+        i += j;
+        PAPI_start_counters(events, j);
+        for (unsigned k = query_count; k; --k)
             pred(layout.layout, layout.layout_size, helper::next_int(queries.lb, queries.ub + 1));
+        PAPI_stop_counters(counters, event_count);
+        for (unsigned k = 0u; k != j; ++k)
+            printf(",%f", counters[k] / lgsz / query_count);
+    }
+    putchar('\n');
 }
 
 void run_test(std::string const &dataset, FILE *f)
