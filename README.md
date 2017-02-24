@@ -5,7 +5,7 @@ This project is all about optimizing binary searches. Different layouts impact t
 ## Building
 The project can be built with CMake and GNU Make. The executables are located in `/output`.
 
-To build, navigate to `/output` and invoke `cmake ..` (for Windows, `cmake -G "MinGW Makefiles" ..` instead) and then `make all` (for Windows, `mingw32-make all` instead).
+To build, navigate to `/output` and invoke `cmake ..` and then `make all`.
 
 ## Data generation
 `datagen` is a utility that generates data and stores them in files. Invoke `datagen <n> <filename>` to generate an array of -2n, -2n + 2, ..., 2n (2n + 1 elements in total), stores query specification in `<filename>` and layout the array in `<filename>.<layoutname>`.
@@ -20,8 +20,6 @@ Run `benchmark` for a comprehensive description of the usage. An example is:
 ```
 benchmark -i:dataset1 -i:dataset2 -r -q:500000 -s:0
 ```
-
-There is also a pair of arguments, `algorithm` and `dont`, to be used with external profilers.
 
 ### Searching algorithms
 We have 10 searching algorithms in total. Below is an exhaustive list of them.
@@ -78,6 +76,9 @@ datagen 81804641 dataset19
 benchmark -i:dataset00 -i:dataset01 -i:dataset02 -i:dataset03 -i:dataset04 -i:dataset05 -i:dataset06 -i:dataset07 -i:dataset08 -i:dataset09 -i:dataset10 -i:dataset11 -i:dataset12 -i:dataset13 -i:dataset14 -i:dataset15 -i:dataset16 -i:dataset17 -i:dataset18 -i:dataset19 -q:100000 -r:100000
 
 ```
+
+## Data processing
+While this project cannot be built on Windows since the introduction to PAPI for profiling, it is recommended to process the data on Windows with automation. The script that converts bunches of output (`*.papi.*`) to an interactive Excel workbook can be found at `/misc/ConvertTo-InteractiveData.ps1`.
 
 ## Notices
 We use [Catch](https://github.com/philsquared/Catch) as our testing framework.
