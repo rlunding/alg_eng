@@ -89,7 +89,8 @@ namespace layouts
             {
                 static constexpr unsigned upperHeight = (height >> 1u);
                 static constexpr unsigned lowerHeight = ((height + 1u) >> 1u);
-                static int const *stable(int const *vEB, int y, unsigned &inorderIndex)
+                TRY_TO_FORCEINLINE
+                inline static int const *stable(int const *vEB, int y, unsigned &inorderIndex)
                 {
                     int const *result = vEBsearch_recursive_helper<upperHeight>::stable(vEB, y, inorderIndex);
                     unsigned offset = ((1u << upperHeight) - 1u - inorderIndex);
@@ -100,7 +101,8 @@ namespace layouts
                     inorderIndex |= subtreeInorderIndex;
                     return subtreeResult ? subtreeResult : result;
                 }
-                static int const *unstable(int const *vEB, int y, unsigned &inorderIndex)
+                TRY_TO_FORCEINLINE
+                inline static int const *unstable(int const *vEB, int y, unsigned &inorderIndex)
                 {
                     int const *result = vEBsearch_recursive_helper<upperHeight>::unstable(vEB, y, inorderIndex);
                     if (result && *result == y)
