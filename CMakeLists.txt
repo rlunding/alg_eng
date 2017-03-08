@@ -6,7 +6,7 @@ message(${CMAKE_CXX_COMPILER_ID})
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     message("Adding -std=c++14 and -O3 for GNU C++ Compiler.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/local/include -std=c++14 -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/local/include -std=c++14 -O2")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message("Adding /D_CRT_SECURE_NO_WARNINGS= /O2 /Ot /Og /Oi /Oy /Ox /Ob2 for MSVC.")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_CRT_SECURE_NO_WARNINGS= /O2 /Ot /Oi /Oy /Ox /Ob2")
