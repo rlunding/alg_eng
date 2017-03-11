@@ -10,24 +10,14 @@ namespace layouts
     {
         namespace _impl
         {
-            void inorder2dfs_height(int const *inorder, unsigned height, int *dfs)
-            {
-                if (height == 0u)
-                    return;
-                --height;
-                *dfs = inorder[(1 << height) - 1];
-                inorder2dfs_height(inorder, height, dfs + 1);
-                inorder2dfs_height(inorder + (1 << height), height, dfs + (1 << height));
-            }
-
-            void inorder2dfs_size(int const *inorder, unsigned size, int *dfs)
+            void inorder2dfs(int const *inorder, unsigned size, int *dfs)
             {
                 if (size == 0u)
                     return;
-                unsigned leftHeight = helper::size2height(size) - 1u;
-                *dfs = inorder[(1 << leftHeight) - 1];
-                inorder2dfs_height(inorder, leftHeight, dfs + 1);
-                inorder2dfs_size(inorder + (1 << leftHeight), size - (1u << leftHeight), dfs + (1 << leftHeight));
+                unsigned skip = (size >> 1u);
+                *dfs = inorder[skip];
+                inorder2dfs(inorder, skip++, dfs + 1);
+                inorder2dfs(inorder + skip, size - skip, dfs + skip);
             }
         }
 
@@ -40,7 +30,7 @@ namespace layouts
                 return;
             }
             dfs = (int *)std::malloc(sizeof(int) * size);
-            _impl::inorder2dfs_size(inorder, size, dfs);
+            _impl::inorder2dfs(inorder, size, dfs);
         }
 
         void destroy(int *dfs, unsigned)
@@ -53,17 +43,17 @@ namespace layouts
             int const *result = nullptr;
             while (dfs_size)
             {
-                unsigned left = (1u << (helper::size2height(dfs_size) - 1u));
                 if (*dfs <= y)
                 {
                     result = dfs;
-                    dfs += left;
-                    dfs_size -= left;
+                    unsigned skip = (dfs_size >> 1u) + 1u;
+                    dfs += skip;
+                    dfs_size -= skip;
                 }
                 else
                 {
                     ++dfs;
-                    dfs_size = left - 1u;
+                    dfs_size >>= 1u;
                 }
             }
             return result;
@@ -74,17 +64,17 @@ namespace layouts
             int const *result = nullptr;
             while (dfs_size)
             {
-                unsigned left = (1u << (helper::size2height(dfs_size) - 1u));
                 if (*dfs < y)
                 {
                     result = dfs;
-                    dfs += left;
-                    dfs_size -= left;
+                    unsigned skip = (dfs_size >> 1u) + 1u;
+                    dfs += skip;
+                    dfs_size -= skip;
                 }
                 else if (*dfs > y)
                 {
                     ++dfs;
-                    dfs_size = left - 1u;
+                    dfs_size >>= 1u;
                 }
                 else
                     return dfs;
