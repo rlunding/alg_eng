@@ -17,7 +17,7 @@ namespace helper
 
     namespace _impl
     {
-        std::mt19937 rnd_src;
+        std::minstd_rand rnd_src;
 
         template <unsigned k>
         struct helper_
