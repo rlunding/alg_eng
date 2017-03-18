@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     }
     /* Output the query information. */
     {
-        int lb = (int)(-2.1 * sz), ub = (int)(2.1 * sz);
+        int lb = (int)(-2 * sz) - 5, ub = (int)(2 * sz) + 5;
         FILE *f = std::fopen(argv[2], "w");
         file_handlers::query_file::save(f, 2u * sz + 1u, lb, ub);
         std::fclose(f);

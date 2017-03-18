@@ -1,10 +1,12 @@
 $VerbosePreference = 'Continue';
 
+$extension = Read-Host -Prompt 'Please enter the name of the profiling tool (pcm/papi).';
+
 <# Parses the result. #>
 Write-Verbose "$([DateTime]::Now.ToString('[yyyy-MM-dd HH:mm:ss]')) Parsing results.";
 $results = @{};
 Get-ChildItem |
-ForEach-Object -Begin { $replacer = [regex]::new('^.*?\.papi\.(.*?)$'); } {
+ForEach-Object -Begin { $replacer = [regex]::new('^.*?\.' + $extension + '\.(.*?)$'); } {
     If ($replacer.IsMatch($_.Name))
     {
         $filename = $replacer.Replace($_.Name, '$1');
@@ -119,9 +121,9 @@ $CreateSheetFor2 = {
     $Worksheet.Range("I$($startRow + 1):I$($row - 1)").FormulaR1C1 = '=R[0]C8/R[0]C7';
     $Worksheet.Cells(7, 7) = 'Avg';
     $Worksheet.Cells(8, 7) = 'Res';
-    $Worksheet.Cells(7, 8).Formula = "=(SUM(`$H`$$($startRow + 1):`$H`$$($row - 1),`">0`") - SUM(`$H`$$($startRow + 1):`$H`$$($row - 1),`"<0`")) / $($row - $startRow - 1)";
+    $Worksheet.Cells(7, 8).Formula = "=(SUMIF(`$H`$$($startRow + 1):`$H`$$($row - 1),`">0`") - SUMIF(`$H`$$($startRow + 1):`$H`$$($row - 1),`"<0`")) / $($row - $startRow - 1)";
     $Worksheet.Cells(8, 8).Formula = "=SQRT(SUMPRODUCT(`$H`$$($startRow + 1):`$H`$$($row - 1), `$H`$$($startRow + 1):`$H`$$($row - 1)) / $($row - $startRow - 1))";
-    $Worksheet.Cells(7, 9).Formula = "=(SUM(`$I`$$($startRow + 1):`$I`$$($row - 1),`">0`") - SUM(`$I`$$($startRow + 1):`$I`$$($row - 1),`"<0`")) / $($row - $startRow - 1)";
+    $Worksheet.Cells(7, 9).Formula = "=(SUMIF(`$I`$$($startRow + 1):`$I`$$($row - 1),`">0`") - SUMIF(`$I`$$($startRow + 1):`$I`$$($row - 1),`"<0`")) / $($row - $startRow - 1)";
     $Worksheet.Cells(8, 9).Formula = "=SQRT(SUMPRODUCT(`$I`$$($startRow + 1):`$I`$$($row - 1), `$I`$$($startRow + 1):`$I`$$($row - 1)) / $($row - $startRow - 1))";
     Write-Verbose "$([DateTime]::Now.ToString('[yyyy-MM-dd HH:mm:ss]')) - Finished.";
 };

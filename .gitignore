@@ -123,3 +123,6 @@ Temporary Items
 .apdisk
 
 # End of https://www.gitignore.io/api/cl,intellij+iml,c++,macos
+
+# inverse ignore external dependencies
+!external/*

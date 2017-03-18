@@ -17,8 +17,6 @@ namespace helper
 
     namespace _impl
     {
-        std::minstd_rand rnd_src;
-
         template <unsigned k>
         struct helper_
         {
@@ -79,17 +77,8 @@ namespace helper
         return (unsigned)(log2(size) + 1);
     }
 
-    /* Generates an int in [lb, ub). */
-    inline int next_int(int lb, int ub)
-    {
-        return lb + _impl::rnd_src() % (ub - lb);
-    }
-
-    inline void seed_random_source(unsigned seed)
-    {
-        _impl::rnd_src.seed(seed);
-    }
-
+    // typedef std::minstd_rand random_generator;
+    typedef std::mt19937 random_generator;
 }
 
 #endif

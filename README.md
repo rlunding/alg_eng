@@ -3,25 +3,31 @@
 This project is all about optimizing binary searches. Different layouts impact the number of cache misses as well as the amount of instructions to navigate in the array. We consider storing the elements by in-order (sorted), BFS order, DFS order and van Emde Boas layout.
 
 ## Building
+
 The project can be built with CMake and GNU Make. The executables are located in `/output`.
 
 To build, navigate to `/output` and invoke `cmake ..` and then `make all`.
 
 ## Data generation
+
 `datagen` is a utility that generates data and stores them in files. Invoke `datagen <n> <filename>` to generate an array of -2n, -2n + 2, ..., 2n (2n + 1 elements in total), stores query specification in `<filename>` and layout the array in `<filename>.<layoutname>`.
 
-For example, if we want to generate data of size 2049 we can run `datagen 1024 my_data`. If the invocation is successful, `my_data` will contain `2049 -2150 2150`, indicating that the length of the array is 2049, the recommended lower bound (resp. upper bound) of a random query is -2150 (resp. 2150). And in `my_data.bfs` one finds the BFS order of the data.
+For example, if we want to generate data of size 2049 we can run `datagen 1024 my_data`. If the invocation is successful, `my_data` will contain `2049 -2053 2053`, indicating that the length of the array is 2049, the recommended lower bound (resp. upper bound) of a random query is -2053 (resp. 2053). And in `my_data.bfs` one finds the BFS order of the data.
 
 ## Benchmark
-The `benchmark` program reads layouts from previous invocation of `datagen`, makes random queries to the data structures and measures the approximate number of cycles taken per query. It generates a tabular output to `stdout` (error information goes to `stderr`) and creates a plot with `gnuplot`.
 
-Run `benchmark` for a comprehensive description of the usage. An example is:
+The `bmpcm` program reads layouts from previous invocation of `datagen`, makes random queries to the data structures and measures the approximate number of cycles taken per query. It generates a tabular output to `stdout` (error information goes to `stderr`) and creates a plot with `gnuplot`.
+
+Run `bmpcm` for a comprehensive description of the usage. An example is:
 
 ```
-benchmark -i:dataset1 -i:dataset2 -r -q:500000 -s:0
+bmpcm -i:dataset1 -i:dataset2 -q:500000 -s:0
 ```
+
+There is also a `bmpapi`, which gives results that are not accurate.
 
 ### Searching algorithms
+
 We have 10 searching algorithms in total. Below is an exhaustive list of them.
 
 | Abbreviation | Meaning | Description |
@@ -42,11 +48,13 @@ We have 10 searching algorithms in total. Below is an exhaustive list of them.
 | `veb.bu`    | van Emde Boas layout, BFS index, Unstable | Unstable version of the above. |
 
 ## Test
+
 It is assumed that the unstable inorder implementation (plain sorted array binary search) is correct. Other implementations are executed and the results are compared against corresponding invocations to unstable inorder implementation.
 
 To run the test, place `testcase`, `testcase.ino`, `testcase.bfs`, `testcase.dfs` and `testcase.veb`, generated from a invocation to `datagen`, in the working directory and invoke `testing`.
 
 ## Comprehensive example
+
 Having built `all`, run the following commands:
 
 ```
@@ -73,12 +81,44 @@ datagen 24238412 dataset16
 datagen 36357618 dataset17
 datagen 54536427 dataset18
 datagen 81804641 dataset19
-benchmark -i:dataset00 -i:dataset01 -i:dataset02 -i:dataset03 -i:dataset04 -i:dataset05 -i:dataset06 -i:dataset07 -i:dataset08 -i:dataset09 -i:dataset10 -i:dataset11 -i:dataset12 -i:dataset13 -i:dataset14 -i:dataset15 -i:dataset16 -i:dataset17 -i:dataset18 -i:dataset19 -q:100000 -r:100000
+bmpcm -i:dataset00 -i:dataset01 -i:dataset02 -i:dataset03 -i:dataset04 -i:dataset05 -i:dataset06 -i:dataset07 -i:dataset08 -i:dataset09 -i:dataset10 -i:dataset11 -i:dataset12 -i:dataset13 -i:dataset14 -i:dataset15 -i:dataset16 -i:dataset17 -i:dataset18 -i:dataset19 -q:100000 -r:100000
 
 ```
 
 ## Data processing
-While this project cannot be built on Windows since the introduction to PAPI for profiling, it is recommended to process the data on Windows with automation. The script that converts bunches of output (`*.papi.*`) to an interactive Excel workbook can be found at `/misc/ConvertTo-InteractiveData.ps1`.
 
-## Notices
+The script that converts bunches of output (`*.pcm.*`) to an interactive Excel workbook can be found at `/misc/ConvertTo-InteractiveData.ps1`.
+
+## (Legal) Notices
+
 We use [Catch](https://github.com/philsquared/Catch) as our testing framework.
+
+The ring 0 driver (in the `external` folder) for Windows comes from RealTemp 3.7, available [here](http://www.techpowerup.com/realtemp/).
+
+The pmem driver comes from the Rekall Framework, available [here](https://github.com/google/rekall/tree/df4c820de7b3a21bd241336c99c12b3b9dde4015/tools/pmem/resources/winpmem).
+
+Both drivers are recommended by developers on Intel Developer Zone, as seen in [this post](https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/542911).
+
+### RealTemp copyright text
+
+Copyright (c) 2007-2008 OpenLibSys.org. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+### The Rekall Memory Forensic Framework copyright
+
+Copyright (C) 2007-2011 Volatile Systems
+Copyright 2012-2016 Google Inc. All Rights Reserved.
+
+All Rights Reserved
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
