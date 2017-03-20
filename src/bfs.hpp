@@ -89,6 +89,80 @@ namespace layouts
             }
             return result;
         }
+
+        int const *pred_pref_stable(int const *bfs, unsigned bfs_size, int y)
+        {
+            int const *result = nullptr;
+            unsigned i = 0u;
+            for (unsigned j, bfs_size2 = bfs_size >> 2u; i < bfs_size2; )
+            {
+                j = (i << 1u) + 1u;
+                _mm_prefetch((char *)(void *)(bfs + j), _MM_HINT_T0);
+                if (bfs[i] <= y)
+                {
+                    result = bfs + i;
+                    i = j + 1u;
+                }
+                else
+                {
+                    i = j;
+                }
+            }
+            for (; i < bfs_size; )
+                if (bfs[i] <= y)
+                {
+                    result = bfs + i;
+                    i = (i << 1u) + 2u;
+                }
+                else
+                {
+                    i = (i << 1u) + 1u;
+                }
+            return result;
+        }
+
+        int const *pred_cmov_pref_stable(int const *bfs, unsigned bfs_size, int y)
+        {
+            int const *result = nullptr;
+            unsigned i = 0u;
+            for (unsigned j, k, bfs_size2 = bfs_size >> 2u; i < bfs_size2; )
+            {
+                j = (i << 1u) + 1u;
+                k = j + 1u;
+                _mm_prefetch((char *)(void *)(bfs + j), _MM_HINT_T0);
+                int const *possible = bfs + i;
+                int comparee = bfs[i];
+                result = (comparee <= y ? possible : result);
+                i = (comparee <= y ? k : j);
+            }
+            for (; i < bfs_size; )
+                if (bfs[i] <= y)
+                {
+                    result = bfs + i;
+                    i = (i << 1u) + 2u;
+                }
+                else
+                {
+                    i = (i << 1u) + 1u;
+                }
+            return result;
+        }
+
+        int const *pred_cmov_stable(int const *bfs, unsigned bfs_size, int y)
+        {
+            int const *result = nullptr;
+            for (unsigned i = 0u, j, k; i < bfs_size; )
+            {
+                j = (i << 1u) + 1u;
+                k = j + 1u;
+                int const *possible = bfs + i;
+                int comparee = bfs[i];
+                result = (comparee <= y ? possible : result);
+                i = (comparee <= y ? k : j);
+            }
+            return result;
+        }
+
     }
 }
 

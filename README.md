@@ -36,6 +36,9 @@ We have 10 searching algorithms in total. Below is an exhaustive list of them.
 | `ino.u`      | In-order, Unstable | Binary search in a sorted array. Returns the pointer to **one of** the largest elements `x` such that `x <= y`. |
 | `bfs.s`      | BFS order, Stable | Binary search in a **complete** binary search tree, arranged in BFS order in the array. Here complete means every level of the tree is fully filled, except possibly the last level, in which leaves are located to the left. |
 | `bfs.u`      | BFS order, Unstable | Unstable version of the above. |
+| `bfs.cs`      | BFS order, Conditional move, Stable | Uses `?:` operator in the hope that Visual Studio generates `cmov*` instructions. |
+| `bfs.ps`      | BFS order, Prefetch, Stable | Uses `_mm_prefetch` to prefetch the data into the cache line. |
+| `bfs.cps`      | BFS order, Conditional move, Prefetch, Stable | A mixture of the above two. |
 | `dfs.s`      | DFS order, Stable | Binary search in a binary search tree, arranged in DFS order in the array. In this binary search tree, any left subtree is **perfect**, and is as large as possible. |
 | `dfs.u`      | DFS order, Unstable | Unstable version of the above. |
 | `veb.rs`    | van Emde Boas layout, Recursive, Stable | Binary search in a binary search tree, whose left subtrees are arranged in van Emde Boas layout in the array and whose right subtrees' roots are arranged consecutively in the array. Searching happens among the right subtrees' roots and then in a left subtree. Searching in a large left subtree is completed with two recursive calls into the top and bottom subtree, as in van Emde Boas layout. |

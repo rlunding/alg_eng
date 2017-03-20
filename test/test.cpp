@@ -47,6 +47,9 @@ TEST_CASE                                                       \
 
 CREATE_TESTCASE("in-order (stable)", "ino", inorder::pred_stable)
 CREATE_TESTCASE("BFS (stable)", "bfs", bfs::pred_stable)
+CREATE_TESTCASE("BFS (cmov, stable)", "bfs", bfs::pred_cmov_stable)
+CREATE_TESTCASE("BFS (pref, stable)", "bfs", bfs::pred_pref_stable)
+CREATE_TESTCASE("BFS (cmov, pref, stable)", "bfs", bfs::pred_cmov_pref_stable)
 CREATE_TESTCASE("BFS (unstable)", "bfs", bfs::pred_unstable)
 CREATE_TESTCASE("DFS (stable)", "dfs", dfs::pred_stable)
 CREATE_TESTCASE("DFS (unstable)", "dfs", dfs::pred_unstable)
