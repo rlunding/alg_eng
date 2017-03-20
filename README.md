@@ -1,18 +1,27 @@
 # Algorithm Engineering: Project 1
 
-This project is all about optimizing binary searches. Different layouts impact the number of cache misses as well as the amount of instructions to navigate in the array. We consider storing the elements by in-order (sorted), BFS order, DFS order and van Emde Boas layout.
+This project is about studying different memory layouts for binary search. Different layouts impact the number of cache misses as well as the amount of instructions to navigate in the array. We consider storing the elements by in-order (sorted), BFS order, DFS order and van Emde Boas layout.
 
 ## Building
 
-The project can be built with CMake and GNU Make. The executables are located in `/output`.
+To compile the project, clone this repository and clone [PCM](https://github.com/opcm/pcm.git). Put the root directory of both repositories under the same directory. Next, compile PCM with `pcm/PCM_Winpcm.vcxproj` with Release x64 configuration and copy the object files (`pcm/PCM_Win/x64/Release/*.obj`) to the root folder of PCM repository clone `pcm`. Then, under `alg_eng/output`, run `cmake .. -G "Visual Studio 14 2015 Win64"` (replace the version with appropriate Visual Studio version) and build `alg_eng/output/alg_eng.sln` with Release x64 configuration. Finally, copy everything under `alg_eng/external` to `alg_eng/output/Release`, where the binary files are located. The `alg_eng/CMakeLists.txt` directs the code to be compiled with flags `/O2 /Ot /Og /Oi /Oy /Ox /Ob2`, which basically means maximal optimisation for speed.
 
-To build, navigate to `/output` and invoke `cmake ..` and then `make all`.
+The automation utilities are PowerShell scripts (`alg_eng/misc/*.ps1`).
+
+## Test
+
+It is assumed that the unstable inorder implementation (plain sorted array binary search) is correct. Other implementations are executed and the results are compared against corresponding invocations to unstable inorder implementation.
+
+To run the test, place `testcase`, `testcase.ino`, `testcase.bfs`, `testcase.dfs` and `testcase.veb`, generated from a invocation to `datagen`, in the working directory and invoke `testing`.
+
 
 ## Data generation
 
 `datagen` is a utility that generates data and stores them in files. Invoke `datagen <n> <filename>` to generate an array of -2n, -2n + 2, ..., 2n (2n + 1 elements in total), stores query specification in `<filename>` and layout the array in `<filename>.<layoutname>`.
 
 For example, if we want to generate data of size 2049 we can run `datagen 1024 my_data`. If the invocation is successful, `my_data` will contain `2049 -2053 2053`, indicating that the length of the array is 2049, the recommended lower bound (resp. upper bound) of a random query is -2053 (resp. 2053). And in `my_data.bfs` one finds the BFS order of the data.
+
+To generate data for benchmarking, run \inlinecode{Get-DataGenerator} and copy the resulting code to the clipboard, then create a folder named \inlinecode{data} under the folder of the binary files, and finally invoke the commands copied to the clipboard in Command Prompt.
 
 ## Benchmark
 
@@ -25,6 +34,12 @@ bmpcm -i:dataset1 -i:dataset2 -q:500000 -s:0
 ```
 
 There is also a `bmpapi`, which gives results that are not accurate.
+
+To do the benchmarking, run `Get-BenchmarkCode` and save the resulting code to a batch file under the folder of the binary file, then open Command Prompt with administrator privilege under that folder and finally invoke the batch. It is recommended that the network be cut and other programs be quitted to minimize flucutations.
+
+## Data processing
+
+To analyse the data with Excel, run `ConvertTo-ExcelWorkbook` under each directory of results. In the default setting these will be `output/Release/results/24601`, `output/Release/results/271828` and `output/Release/results/314159`.
 
 ### Searching algorithms
 
@@ -49,48 +64,6 @@ We have 10 searching algorithms in total. Below is an exhaustive list of them.
 | `veb.iu`    | van Emde Boas layout, Recursive, Unstable | Unstable version of the above. |
 | `veb.bs`    | van Emde Boas layout, BFS index, Stable | Searching in a large left subtree is completed as if it is searching in BFS layout. The loop tracks the BFS index of the pivot (with fast bit operations) and use an algorithm to convert BFS index to van Emde Boas layout index. The conversion uses a simple loop or tail recursion. |
 | `veb.bu`    | van Emde Boas layout, BFS index, Unstable | Unstable version of the above. |
-
-## Test
-
-It is assumed that the unstable inorder implementation (plain sorted array binary search) is correct. Other implementations are executed and the results are compared against corresponding invocations to unstable inorder implementation.
-
-To run the test, place `testcase`, `testcase.ino`, `testcase.bfs`, `testcase.dfs` and `testcase.veb`, generated from a invocation to `datagen`, in the working directory and invoke `testing`.
-
-## Comprehensive example
-
-Having built `all`, run the following commands:
-
-```
-datagen 24601 testcase
-testing
-
-datagen 36902 dataset00
-datagen 55352 dataset01
-datagen 83028 dataset02
-datagen 124543 dataset03
-datagen 186814 dataset04
-datagen 280221 dataset05
-datagen 420331 dataset06
-datagen 630497 dataset07
-datagen 945745 dataset08
-datagen 1418618 dataset09
-datagen 2127926 dataset10
-datagen 3191890 dataset11
-datagen 4787834 dataset12
-datagen 7181752 dataset13
-datagen 10772628 dataset14
-datagen 16158941 dataset15
-datagen 24238412 dataset16
-datagen 36357618 dataset17
-datagen 54536427 dataset18
-datagen 81804641 dataset19
-bmpcm -i:dataset00 -i:dataset01 -i:dataset02 -i:dataset03 -i:dataset04 -i:dataset05 -i:dataset06 -i:dataset07 -i:dataset08 -i:dataset09 -i:dataset10 -i:dataset11 -i:dataset12 -i:dataset13 -i:dataset14 -i:dataset15 -i:dataset16 -i:dataset17 -i:dataset18 -i:dataset19 -q:100000 -r:100000
-
-```
-
-## Data processing
-
-The script that converts bunches of output (`*.pcm.*`) to an interactive Excel workbook can be found at `/misc/ConvertTo-InteractiveData.ps1`.
 
 ## (Legal) Notices
 
