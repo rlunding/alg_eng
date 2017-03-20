@@ -81,7 +81,7 @@ int main(int argc, char **argv)
         int *layout;
         unsigned layout_size;
         profile.build(inorder, 2u * sz + 1u, layout, layout_size);
-        FILE *f = std::fopen((argv[2] + profile.extension).c_str(), "w");
+        FILE *f = std::fopen((argv[2] + profile.extension).c_str(), "wb");
         file_handlers::layout_file::save(f, layout, layout_size);
         fclose(f);
         profile.destroy(layout, layout_size);

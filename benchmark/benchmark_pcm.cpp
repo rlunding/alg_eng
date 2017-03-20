@@ -41,7 +41,7 @@ void run_test(std::string const &dataset, FILE *f)
     {
         if (last_layout != a.layout_name)
         {
-            FILE *flayout = fopen((dataset + a.layout_name).c_str(), "r");
+            FILE *flayout = fopen((dataset + a.layout_name).c_str(), "rb");
             layout.replace(flayout);
             fclose(flayout);
             last_layout = a.layout_name;

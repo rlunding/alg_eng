@@ -66,7 +66,7 @@ namespace file_handlers
                 return;
             }
             unsigned new_size;
-            if (std::fscanf(f, "%u", &new_size) != 1)
+            if (std::fread(&new_size, sizeof(unsigned), 1, f) != 1)
             {
                 dispose();
                 return;
@@ -79,19 +79,17 @@ namespace file_handlers
                 layout_capacity = new_size;
             }
             layout_size = new_size;
-            for (unsigned i = 0; i != layout_size; ++i)
-                if (std::fscanf(f, "%d", layout + i) != 1)
-                {
-                    dispose();
-                    return;
-                }
+            if (std::fread(layout, sizeof(layout[0]), layout_size, f) != layout_size)
+            {
+                dispose();
+                return;
+            }
             valid = true;
         }
         static void save(FILE *f, int *layout, unsigned layout_size)
         {
-            std::fprintf(f, "%u\n", layout_size);
-            for (unsigned i = 0u; i != layout_size; ++i)
-                std::fprintf(f, "%d\n", layout[i]);
+            std::fwrite(&layout_size, sizeof(unsigned), 1, f);
+            std::fwrite(layout, sizeof(layout[0]), layout_size, f);
         }
         ~layout_file()
         {

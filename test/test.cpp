@@ -17,10 +17,10 @@ TEST_CASE                                                       \
     FILE *fq = fopen("testcase", "r");                          \
     file_handlers::query_file queries{ fq };                    \
     fclose(fq);                                                 \
-    FILE *fl = fopen("testcase." EXTENSION, "r");               \
+    FILE *fl = fopen("testcase." EXTENSION, "rb");              \
     file_handlers::layout_file layout{ fl };                    \
     fclose(fl);                                                 \
-    FILE *fi = fopen("testcase.ino", "r");                      \
+    FILE *fi = fopen("testcase.ino", "rb");                     \
     file_handlers::layout_file inorder_layout{ fi };            \
     fclose(fi);                                                 \
     REQUIRE(queries.valid);                                     \
